@@ -25,6 +25,7 @@ export class UsersService {
                 newUser.username = user.username;
                 newUser.email = user.email;
                 newUser.password = passwordHash;
+                newUser.role = user.role;
 
                 return from(this.userRepositry.save(newUser)).pipe(
                     map((user: User) => {
@@ -61,6 +62,10 @@ export class UsersService {
     updateOne(id: number, user: User): Observable<any> {
         delete user.email;
         delete user.password;
+        return from(this.userRepositry.update(id, user));
+    }
+
+    updateRoleOfUser(id: number, user: User): Observable<any> {
         return from(this.userRepositry.update(id, user));
     }
 
