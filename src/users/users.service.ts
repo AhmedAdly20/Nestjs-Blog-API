@@ -9,6 +9,11 @@ import { switchMap } from 'rxjs';
 import { map } from 'rxjs';
 import { catchError } from 'rxjs';
 import { throwError } from 'rxjs';
+import {
+    paginate,
+    Pagination,
+    IPaginationOptions,
+} from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class UsersService {
@@ -62,6 +67,7 @@ export class UsersService {
     updateOne(id: number, user: User): Observable<any> {
         delete user.email;
         delete user.password;
+        delete user.role;
         return from(this.userRepositry.update(id, user));
     }
 
@@ -104,5 +110,15 @@ export class UsersService {
 
     findByMail(email: string): Observable<User> {
         return from(this.userRepositry.findOne({email}));
+    }
+
+    paginate(options: IPaginationOptions): Observable<Pagination<User>> {
+        return from(paginate<User>(this.userRepositry, options)).pipe(
+            map((usersPageable: Pagination<User>) => {
+                usersPageable.items.forEach(function (v) {delete v.password});
+
+                return usersPageable;
+            })
+        )
     }
 }
